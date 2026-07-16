@@ -1,0 +1,577 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "DM Sans", sans-serif;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Note: body's actual background/text color for dark mode comes from
+   body:has(input[value="dark"]:checked) below (via --c-bg/--c-content),
+   not from this class - that keeps a single source of truth and a single
+   transition timing (400ms) instead of two rules racing each other.
+   The dark-theme class is still used by the more specific rules further
+   down (buttons, tiles, .info) that don't hook into the CSS variables. */
+
+.container {
+    text-align: center;
+}
+
+body {
+  --c-glass: #bbbbbc;
+  --c-light: #fff;
+  --c-dark: #000;
+  
+  --c-content: #224;
+  --c-action: #0052f5;
+  
+  --c-bg: #E8E8E9;
+
+  --c-mv: #fffacd; /*added*/
+  --c-success: #4CD964; /*added*/
+  
+  --glass-reflex-dark: 1;
+  --glass-reflex-light: 1;
+  
+  --saturation: 150%;
+  
+  font-size: 20px;
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  background: var(--c-bg);
+  color: var(--c-content);
+  
+  transition: background 400ms cubic-bezier(1, 0.0, 0.4, 1), color 400ms cubic-bezier(1, 0.0, 0.4, 1);
+}
+
+body:has(input[value="dark"]:checked) {
+  --c-glass: #bbbbbc;
+  --c-light: #fff;
+  --c-dark: #000;
+  
+  --c-content: #e1e1e1;
+  --c-action: #03d5ff;
+  
+  --c-bg: #1b1b1d;
+
+  --c-mv: #A2C5EB; /*added*/
+  --c-success: #34D399; /*added*/
+  
+  --glass-reflex-dark: 2;
+  --glass-reflex-light: 0.3;
+  
+  --saturation: 150%;
+}
+
+body:has(input[value="dim"]:checked) {
+  --c-light: #99deff;
+  --c-dark: #20001b;
+  --c-glass: hsl(335 250% 74% / 1);
+  
+  --c-content: #d5dbe2;
+  --c-action: #ff48a9;
+  
+  --c-bg: #152433;
+  --c-success: #5EEAD4; /*added*/
+  
+  --glass-reflex-dark: 2;
+  --glass-reflex-light: 0.7;
+  
+  --saturation: 200%;
+}
+
+
+.switcher {
+  position: fixed;
+  z-index: 1;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 162px;
+  max-width: 244px;
+  height: 70px;
+  box-sizing: border-box;
+  padding: 8px 12px 10px;
+  margin: 0 auto;
+  border: none;
+  border-radius: 99em;
+  background-color: color-mix(in srgb, var(--c-glass) 12%, transparent);
+  backdrop-filter: blur(8px) url(#switcher) saturate(var(--saturation));
+  -webkit-backdrop-filter: blur(8px) saturate(var(--saturation));
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 10%), transparent),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 90%), transparent), 
+    inset -2px -2px 0px -2px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent), 
+    inset -3px -8px 1px -6px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent), 
+    inset -0.3px -1px 4px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 12%), transparent), 
+    inset -1.5px 2.5px 0px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent), 
+    inset 0px 3px 4px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent), 
+    inset 2px -6.5px 1px -4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent), 
+    0px 1px 5px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent), 
+    0px 6px 16px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+  transition: 
+    background-color 400ms 
+      cubic-bezier(1, 0.0, 0.4, 1),
+    box-shadow 400ms
+      cubic-bezier(1, 0.0, 0.4, 1);
+}
+
+.switcher__legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.switcher__input {
+  clip: rect(0 0 0 0);
+  clip-path: inset(100%);
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+.switcher__icon {
+  display: block;
+  width: 100%;
+  transition: scale 200ms cubic-bezier(0.5, 0, 0, 1);
+}
+
+.switcher__filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: -1;
+}
+
+.switcher__option {
+  --c: var(--c-content);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+  width: 68px;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: 99em;
+  opacity: 1;
+  transition: all 160ms;
+}
+
+.switcher__option:hover {
+  --c: var(--c-action);
+  cursor: pointer;
+}
+
+.switcher__option:hover .switcher__icon {
+  scale: 1.2;
+}
+
+.switcher__option:has(input:checked) {
+  --c: var(--c-content);
+  cursor: auto;
+}
+
+.switcher__option:has(input:checked) .switcher__icon {
+  scale: 1;
+}
+
+.switcher::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  display: block;
+  width: 84px;
+  height: calc(100% - 10px);
+  border-radius: 99em;
+  background-color: color-mix(in srgb, var(--c-glass) 36%, transparent);
+  z-index: -1;
+  box-shadow: 
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 10%), transparent),
+    inset 2px 1px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 90%), transparent), 
+    inset -1.5px -1px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent), 
+    inset -2px -6px 1px -5px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent), 
+    inset -1px 2px 3px -1px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent), 
+    inset 0px -4px 1px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent), 
+    0px 3px 6px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+}
+
+.switcher:has(input[c-option="1"]:checked)::after {
+  translate: 0 0;
+  transform-origin: right;
+  transition: 
+    background-color 400ms 
+      cubic-bezier(1, 0.0, 0.4, 1),
+    box-shadow 400ms
+      cubic-bezier(1, 0.0, 0.4, 1),
+    translate 400ms 
+      cubic-bezier(1, 0.0, 0.4, 1);
+  animation: scaleToggle 440ms ease; 
+}
+
+.switcher:has(input[c-option="2"]:checked)::after {
+  translate: 76px 0;
+  transition: 
+    background-color 400ms 
+      cubic-bezier(1, 0.0, 0.4, 1),
+    box-shadow 400ms
+      cubic-bezier(1, 0.0, 0.4, 1),
+    translate 400ms 
+      cubic-bezier(1, 0.0, 0.4, 1);
+  animation: scaleToggle2 440ms ease; 
+}
+
+.switcher[c-previous="1"]:has(input[c-option="2"]:checked)::after {
+  transform-origin: left;
+}
+
+.switcher[c-previous="3"]:has(input[c-option="2"]:checked)::after {
+  transform-origin: right;
+}
+
+.switcher:has(input[c-option="3"]:checked)::after {
+  translate: 152px 0;
+  transform-origin: left;
+  transition: 
+    background-color 400ms 
+      cubic-bezier(1, 0.0, 0.4, 1),
+    box-shadow 400ms
+      cubic-bezier(1, 0.0, 0.4, 1),
+    translate 400ms 
+      cubic-bezier(1, 0.0, 0.4, 1);
+  animation: scaleToggle3 440ms ease; 
+}
+
+
+@keyframes scaleToggle {
+  0% { scale: 1 1; }
+  50% { scale: 1.1 1; }
+  100% { scale: 1 1; }
+}
+
+@keyframes scaleToggle2{
+  0% { scale: 1 1; }
+  50% { scale: 1.2 1; }
+  100% { scale: 1 1; }
+} 
+
+@keyframes scaleToggle3 {
+  0% { scale: 1 1; }
+  50% { scale: 1.1 1; }
+  100% { scale: 1 1; }
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 45px;
+}
+
+.controls {
+    margin-bottom: 30px;
+}
+
+/* CSS */
+.controls button {
+  align-items: center;
+  appearance: none;
+  background-color: #fff;
+  border-radius: 24px;
+  border-style: none;
+  box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+  box-sizing: border-box;
+  color: #3c4043;
+  cursor: pointer;
+  display: inline-flex;
+  fill: currentcolor;
+  font-family: "Google Sans",Roboto,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  justify-content: center;
+  letter-spacing: .25px;
+  line-height: normal;
+  max-width: 100%;
+  overflow: visible;
+  padding: 2px 24px;
+  position: relative;
+  text-align: center;
+  text-transform: none;
+  transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: auto;
+  will-change: transform,opacity;
+  z-index: 0;
+}
+
+.controls button:hover {
+  background: #F6F9FE;
+  color: #174ea6;
+}
+
+.controls button:active {
+  box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
+  outline: none;
+}
+
+.controls button:not(:disabled) {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+.controls button:not(:disabled):hover {
+  box-shadow: rgba(60, 64, 67, .3) 0 2px 3px 0, rgba(60, 64, 67, .15) 0 6px 10px 4px;
+}
+
+.controls button:not(:disabled):focus {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+.controls button:not(:disabled):active {
+  box-shadow: rgba(60, 64, 67, .3) 0 4px 4px 0, rgba(60, 64, 67, .15) 0 8px 12px 6px;
+}
+
+.controls button:disabled {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+.controls button:hover {
+    background-color: #f0f0f0;
+}
+
+body.dark-theme .controls button {
+    background-color: white;
+    color: #333;
+    border-color: #ccc;
+}
+
+body.dark-theme .controls button:hover {
+    background-color: #e0e0e0;
+}
+
+body.dark-theme .controls button.exit-setup {
+    background-color: #ffcccc;
+    color: #333;
+}
+
+body.dark-theme .controls button.exit-setup:hover {
+    background-color: #ffaaaa;
+}
+
+.controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.game-area {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.puzzle-container {
+    display: inline-block;
+    position: relative;
+    border-radius: 6px;
+}
+
+.puzzle-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 2px;
+    background-color: #333;
+    padding: 2px;
+    width: 400px;
+    height: 400px;
+    position: relative;
+    z-index: 1;
+    border-radius: 4px;
+}
+
+/* Solved-state flash: a green ring blooms around the grid perimeter and
+   fades completely away, plus a subtle scale pulse on the grid itself.
+   Triggered by adding/removing .solved-flash on .puzzle-container (see
+   main.js triggerSolvedFlash()). Fully transparent at both start and end,
+   so nothing lingers once the animation finishes. */
+.puzzle-container::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 10px;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--c-success) 0%, transparent);
+}
+
+.puzzle-container.solved-flash {
+    animation: solvedPulse 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.puzzle-container.solved-flash::after {
+    animation: solvedRing 1400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes solvedPulse {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.035); }
+    100% { transform: scale(1); }
+}
+
+@keyframes solvedRing {
+    0% {
+        opacity: 0;
+        box-shadow:
+            0 0 0 0 color-mix(in srgb, var(--c-success) 90%, transparent),
+            0 0 24px 6px color-mix(in srgb, var(--c-success) 60%, transparent);
+    }
+    12% {
+        opacity: 1;
+        box-shadow:
+            0 0 0 6px color-mix(in srgb, var(--c-success) 85%, transparent),
+            0 0 32px 10px color-mix(in srgb, var(--c-success) 55%, transparent);
+    }
+    35% {
+        opacity: 1;
+        box-shadow:
+            0 0 0 10px color-mix(in srgb, var(--c-success) 55%, transparent),
+            0 0 40px 14px color-mix(in srgb, var(--c-success) 35%, transparent);
+    }
+    100% {
+        opacity: 0;
+        box-shadow:
+            0 0 0 16px color-mix(in srgb, var(--c-success) 0%, transparent),
+            0 0 50px 18px color-mix(in srgb, var(--c-success) 0%, transparent);
+    }
+}
+
+.sidebar {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 220px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align items to the top */
+    align-items: center;
+    padding-left: 40px;
+}
+
+.tile {
+    background-color: white;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 400ms cubic-bezier(1, 0.0, 0.4, 1), box-shadow 400ms cubic-bezier(1, 0.0, 0.4, 1);
+}
+
+.tile:hover {
+    background-color: #f0f0f0;
+}
+
+.tile.empty {
+    background-color: #e0e0e0;
+    cursor: default;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 0 10px rgba(0, 0, 0, 0.12);
+}
+
+.tile.empty:hover {
+    background-color: #e0e0e0;
+}
+
+body.dark-theme .tile.empty {
+    background-color: #2a2a2a;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Correctly-placed tile: a pastel green tint - the only highlight left on
+   the board now that the movable-tile cue has been removed (the blank's
+   shadowed look is enough to show where the gap is; anyone playing this
+   already knows adjacent-to-the-blank tiles are the ones that move). */
+.tile.correct {
+    background-color: #cdf0d4;
+}
+
+body.dark-theme .tile.correct {
+    background-color: #bfe8c8;
+}
+
+/* Quick shake feedback for clicking a tile that isn't adjacent to the
+   blank. Small and fast so it reads as "that didn't work" rather than
+   anything alarming. Triggered by toggling .shake (see main.js). */
+.tile.shake {
+    animation: tileShake 260ms ease;
+}
+
+@keyframes tileShake {
+    0%   { transform: translateX(0); }
+    20%  { transform: translateX(-6px); }
+    40%  { transform: translateX(5px); }
+    60%  { transform: translateX(-3px); }
+    80%  { transform: translateX(2px); }
+    100% { transform: translateX(0); }
+}
+
+.info {
+    margin-top: 20px;
+    transition: color 400ms cubic-bezier(1, 0.0, 0.4, 1);
+}
+
+body.dark-theme .info {
+    color: white;
+}
+
+.info p {
+    margin: 5px 0;
+}
+
+#stopwatch {
+    font-family: "DM Sans", sans-serif;
+    font-weight: bold;
+    font-size: 28px;
+    margin-top: 160px;
+}
+
+#step-counter {
+    font-family: "DM Sans", sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+#solutionInfo {
+    margin-top: 20px;
+}
+
+
+
+
+
