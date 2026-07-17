@@ -15,7 +15,7 @@ Just open `index.html` in a browser. It's plain HTML, CSS, and JavaScript.
 - **Click tiles or drag a solution through automatically** — manual play and auto-solve share the same board state, so you can mix the two freely (solve a few moves by hand, then let it finish, or interrupt an auto-solve mid-way to try something yourself).
 - **Solves optimally in the vast majority of cases**, and always terminates quickly even on the rare board that would otherwise take a search too long to finish.
 - **Setup Mode** lets you arrange any starting position by hand instead of only shuffling from solved.
-- **Light, dark, and dim themes**, with a glassy, animated theme switcher ([by Vadim Matveev](https://codepen.io/fooontic/pen/KwpRaGr)).
+- **Light and dark themes**, with a glassy, animated theme switcher ([by Vadim Matveev](https://codepen.io/fooontic/pen/KwpRaGr)).
 - Tiles that are already in their correct spot get a quiet green tint, so you can see yourself converging on the solution as you go.
 - A green flash sweeps the board the moment you solve it.
 - Click a tile that can't legally move and it gives a quick shake instead of just sitting there unresponsive.
