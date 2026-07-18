@@ -12,7 +12,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 100vh; /* fallback for browsers without dvh support */
+    min-height: 100dvh; /* accounts for mobile browser chrome (e.g. Safari's
+                            bottom tab bar) that 100vh ignores, so content
+                            doesn't extend underneath it */
     padding: 20px;
 }
 
@@ -594,18 +597,25 @@ body.dark-theme .info {
     }
 
     .switcher {
-        /* Needs to stay a positioned element (just not `fixed` anymore) so
-           that .switcher::after - the sliding pill background, which is
-           `position: absolute` and sized/placed relative to .switcher - has
-           a correct containing block. Switching this to `position: static`
-           removed that reference frame entirely, so the pill's box instead
-           sized itself against the page as a whole: a large, translucent,
-           switcher-colored rectangle running the full page height, sliding
-           left/right on theme change (still tracking the `translate` rules
-           below, just relative to the wrong element). `relative` keeps the
-           pill correctly contained while still flowing normally in the
-           document like a regular block-level element. */
-        position: relative;
+        /* Fixed to the viewport (not the document), positioned in the top-right
+           corner. This is a deliberate change from centering it above the
+           title in normal document flow: as a fixed element it's taken out
+           of the page's vertical stack entirely, so it no longer pushes the
+           title/buttons/grid down - which is exactly what's needed to fit
+           everything above Safari's bottom tab bar. */
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        margin: 0;
+        /* Scale the whole switcher down as one unit (roughly half size, in
+           line with the button height) rather than hand-tuning each internal
+           dimension - a transform scales the pill's position/size and the
+           icons together, so nothing drifts out of alignment the way it
+           would if only some of the pixel values below were changed. transform-origin
+           keeps it anchored to its own top-right corner as it shrinks, so it
+           stays tucked in the corner instead of scaling toward the center. */
+        transform: scale(0.58);
+        transform-origin: top right;
         /* Belt-and-suspenders: even with the correct containing block
            restored above, clip anything that tries to render outside the
            pill's own rounded box. This makes it physically impossible for
@@ -615,7 +625,6 @@ body.dark-theme .info {
            drop-shadow layers from the box-shadow below (the last two
            un-"inset" entries) - a very minor cosmetic loss, mobile-only. */
         overflow: hidden;
-        margin: 0 auto 16px;
         /* The SVG-filter portion of backdrop-filter (url(#switcher), used
            for the glass distortion look) is unreliable on mobile browsers -
            some render it into a backing layer far larger than the element
@@ -628,8 +637,11 @@ body.dark-theme .info {
     }
 
     h1 {
-        font-size: 32px;
-        margin-bottom: 12px;
+        font-size: 28px;
+        margin-bottom: 10px;
+        /* Leave room on the right so the shrunken switcher (top-right,
+           fixed) doesn't sit on top of the title text. */
+        padding-right: 90px;
     }
 
     .controls {
