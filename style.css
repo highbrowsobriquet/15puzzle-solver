@@ -162,6 +162,13 @@ body:has(input[value="dim"]:checked) {
   width: 0;
   height: 0;
   z-index: -1;
+  pointer-events: none;
+}
+
+.switcher__filter svg {
+  width: 0;
+  height: 0;
+  position: absolute;
 }
 
 .switcher__option {
@@ -571,7 +578,67 @@ body.dark-theme .info {
     margin-top: 20px;
 }
 
+/* --- Mobile layout ---
+   Below this width there isn't room for the desktop layout: the switcher
+   is fixed-positioned over the title, the grid is a hardcoded 400px (wider
+   than the screen itself), and the sidebar sits to the grid's right via
+   `left: 100%`, which pushes it off-screen once the grid already fills
+   the viewport. All three get restructured into a single centered column:
+   switcher, then title, then buttons, then a grid sized to the viewport,
+   then the sidebar underneath. */
+@media (max-width: 600px) {
+    body {
+        flex-direction: column;
+        padding: 12px;
+        align-items: center;
+    }
 
+    .switcher {
+        position: static;
+        margin: 0 auto 16px;
+    }
 
+    h1 {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
 
+    .controls {
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
 
+    .controls button {
+        padding: 2px 16px;
+        font-size: 13px;
+    }
+
+    .game-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .puzzle-grid {
+        width: min(400px, 88vw);
+        height: min(400px, 88vw);
+    }
+
+    .tile {
+        font-size: 7vw;
+    }
+
+    .sidebar {
+        position: static;
+        width: auto;
+        padding-left: 0;
+        margin-top: 20px;
+    }
+
+    #stopwatch {
+        margin-top: 0;
+    }
+}
