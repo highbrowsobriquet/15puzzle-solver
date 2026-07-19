@@ -592,7 +592,7 @@ body.dark-theme .info {
 @media (max-width: 600px) {
     body {
         flex-direction: column;
-        padding: 12px;
+        padding: 28px 12px 12px;
         align-items: center;
     }
 
@@ -604,7 +604,7 @@ body.dark-theme .info {
            title/buttons/grid down - which is exactly what's needed to fit
            everything above Safari's bottom tab bar. */
         position: fixed;
-        top: 12px;
+        top: 28px;
         right: 12px;
         margin: 0;
         /* Scale the whole switcher down as one unit (roughly half size, in
@@ -681,5 +681,14 @@ body.dark-theme .info {
 
     #stopwatch {
         margin-top: 0;
+        font-size: 20px;
+    }
+
+    #step-counter {
+        font-size: 17px;
+    }
+
+    .info {
+        margin-top: 10px;
     }
 }
