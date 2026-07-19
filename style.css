@@ -644,23 +644,49 @@ body.dark-theme .info {
         padding-right: 90px;
     }
 
+    /* .container becomes the single grid for the whole mobile layout, so
+       .controls (2x2 button grid) and .sidebar (stopwatch/steps) can sit
+       side by side on the same row, with the puzzle grid on its own row
+       below. .game-area is given `display: contents` so its two children
+       (.puzzle-container and .sidebar) behave as if they were direct
+       children of .container for grid-placement purposes, without any
+       change to the actual HTML nesting or to main.js's element references. */
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 12px;
+        justify-items: center;
+    }
+
+    h1, .info {
+        grid-column: 1 / -1;
+    }
+
     .controls {
-        margin-bottom: 20px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        grid-column: 1;
+        grid-row: 2;
+        margin-bottom: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 8px;
+        width: 100%;
+        align-self: start;
     }
 
     .controls button {
-        padding: 2px 16px;
+        padding: 2px 10px;
         font-size: 13px;
+        width: 100%;
     }
 
     .game-area {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        display: contents;
+    }
+
+    .puzzle-container {
+        grid-column: 1 / -1;
+        grid-row: 3;
+        margin-top: 20px;
     }
 
     .puzzle-grid {
@@ -673,10 +699,14 @@ body.dark-theme .info {
     }
 
     .sidebar {
+        grid-column: 2;
+        grid-row: 2;
         position: static;
-        width: auto;
+        width: 100%;
         padding-left: 0;
-        margin-top: 20px;
+        margin-top: 0;
+        align-self: start;
+        justify-content: center;
     }
 
     #stopwatch {
