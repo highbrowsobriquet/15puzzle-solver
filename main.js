@@ -409,7 +409,7 @@ function calculatePath() {
         solutionInfo.textContent = e.data.optimal
             ? `Optimal path: ${seq.length} slides.`
             : `Found a path: ${seq.length} slides.`;
-        solveBtn.textContent = "Solve (next move)";
+        solveBtn.textContent = "Solve (next\u00A0move)";
         updateSolveButtonState();
         display();
     };

@@ -552,11 +552,15 @@ body.dark-theme .tile.correct {
 
 .info {
     margin-top: 20px;
-    transition: color 400ms cubic-bezier(1, 0.0, 0.4, 1);
-}
-
-body.dark-theme .info {
-    color: white;
+    /* No explicit color here (and no dark-theme override below) - this
+       inherits body's color naturally, exactly like h1 does. It used to
+       have its own `color: white` override for dark mode, which is a
+       different destination color than body's actual --c-content value
+       (#e1e1e1) - both transitioned over the same 400ms, but landing on
+       two different colors made this element visibly settle at a
+       different-looking point than everything else, especially on the
+       dark-to-light transition. One color source now, so it can't drift
+       out of sync with the rest of the page in either direction. */
 }
 
 .info p {
@@ -706,16 +710,45 @@ body.dark-theme .info {
         padding-left: 0;
         margin-top: 0;
         align-self: start;
-        justify-content: center;
+        /* flex-start, not center: centering was the actual cause of the
+           "everything shifts when the solve result text appears" bug. With
+           `center`, the sidebar's content block (stopwatch + steps +
+           solutionInfo) re-centers itself vertically every time
+           solutionInfo's text grows or shrinks, visibly nudging the
+           stopwatch/steps up or down each time. Pinning to the top means
+           the stopwatch and step counter never move; only the reserved
+           space below them (see #solutionInfo) is affected. */
+        justify-content: flex-start;
     }
 
     #stopwatch {
+        /* Flush with the top of the button grid alongside it, rather than
+           sitting inside a vertically-centered block (see .sidebar above). */
         margin-top: 0;
         font-size: 20px;
     }
 
     #step-counter {
+        /* Pulled in closer underneath the stopwatch. */
+        margin-top: 4px;
         font-size: 17px;
+    }
+
+    #solutionInfo {
+        /* Sized so its bottom edge lines up with the bottom of the button
+           grid for the common messages ("Optimal path: N slides.", "Found
+           a path: N slides.", "Slides remaining: N", "Solved!" - all of
+           which are a single line at this width). Two rare messages (the
+           puzzle already being solved right after Setup Mode, or the
+           solver genuinely failing) run to 3 lines and will grow slightly
+           past this point - an acceptable trade since they're edge cases,
+           in exchange for pixel alignment on the messages seen almost all
+           the time. Either way, having a min-height at all is what stops
+           the whole layout from jumping every time a new result appears -
+           the space is already reserved, the text just fills more or less
+           of it. */
+        margin-top: 10px;
+        min-height: 48px;
     }
 
     .info {
