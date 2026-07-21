@@ -29,10 +29,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('setupModeBtn').onclick = toggleSetupMode;
 
     const inputs = document.querySelectorAll(".switcher__input");
+    const switcherEl = document.querySelector(".switcher");
     const THEME_STORAGE_KEY = "15puzzle-theme";
 
     function applyTheme(value) {
-        document.body.classList.remove("light-theme", "dark-theme", "dim-theme");
+        document.body.classList.remove("light-theme", "dark-theme");
         if (value !== "light") document.body.classList.add(`${value}-theme`);
         // Keep <html>'s class (set early/synchronously in index.html's inline
         // head script, before first paint, to avoid a flash-of-wrong-theme on
@@ -41,9 +42,24 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.className = (value !== "light") ? `theme-${value}` : "";
     }
 
+    // Replays the switcher pill's scale-pulse (see .switch-anim-1/2 in
+    // style.css). Remove-then-reflow-then-add so it can replay even if
+    // triggered twice in a row - same trick used elsewhere in this file for
+    // the solved-flash and tile-shake feedback.
+    function triggerSwitcherPulse(optionNum) {
+        switcherEl.classList.remove('switch-anim-1', 'switch-anim-2');
+        void switcherEl.offsetWidth;
+        switcherEl.classList.add(`switch-anim-${optionNum}`);
+    }
+
     inputs.forEach((input) => {
         input.addEventListener("change", () => {
             applyTheme(input.value);
+            // 'change' only fires from a real user interaction (clicking a
+            // theme option) - setting .checked from JS, as the restore step
+            // below does on load, does not fire it - so the pill's pulse
+            // only ever plays on an actual switch, never on page load/refresh.
+            triggerSwitcherPulse(input.getAttribute('c-option'));
             // Persist so the choice survives a refresh (or a whole lot of them).
             try {
                 localStorage.setItem(THEME_STORAGE_KEY, input.value);
@@ -57,7 +73,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restore the saved theme's radio state (the actual theme colors are
     // already showing pre-paint, applied by the inline script in index.html's
     // <head> - this just brings the visible UI, e.g. which icon looks
-    // "selected", into agreement with that).
+    // "selected", into agreement with that). Setting .checked directly does
+    // not fire 'change', so this does not trigger the switch-pulse animation.
     try {
         const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
         if (savedTheme) {

@@ -57,14 +57,33 @@ body {
   transition: background 400ms cubic-bezier(1, 0.0, 0.4, 1), color 400ms cubic-bezier(1, 0.0, 0.4, 1);
 }
 
-/* Mirrors of the two blocks below, keyed off a class set on <html> instead
-   of the radio's :has(:checked) state. An inline script at the very top of
+body:has(input[value="dark"]:checked) {
+  --c-glass: #bbbbbc;
+  --c-light: #fff;
+  --c-dark: #000;
+  
+  --c-content: #e1e1e1;
+  --c-action: #03d5ff;
+  
+  --c-bg: #1b1b1d;
+
+  --c-mv: #A2C5EB; /*added*/
+  --c-success: #34D399; /*added*/
+  
+  --glass-reflex-dark: 2;
+  --glass-reflex-light: 0.3;
+  
+  --saturation: 150%;
+}
+
+/* Mirrors the block above, keyed off a class set on <html> instead of the
+   radio's :has(:checked) state. An inline script at the very top of
    index.html's <head> sets this class from localStorage before the browser's
    first paint - :has() can't do that on its own because the radio inputs
    it depends on don't exist in the DOM yet at that point, so without this,
    the page always paints once in the light theme first and then swaps,
-   which is what caused the flash on reload. Values are identical to their
-   :has() counterparts on purpose: once main.js runs, it checks the matching
+   which is what caused the flash on reload. Values are identical to the
+   :has() block above on purpose: once main.js runs, it checks the matching
    radio (making the :has() rule match too) and keeps this class in sync, so
    the two mechanisms never disagree - this one just covers the gap before
    that JS has had a chance to run. */
@@ -86,60 +105,6 @@ html.theme-dark body {
 
   --saturation: 150%;
 }
-
-html.theme-dim body {
-  --c-light: #99deff;
-  --c-dark: #20001b;
-  --c-glass: hsl(335 250% 74% / 1);
-
-  --c-content: #d5dbe2;
-  --c-action: #ff48a9;
-
-  --c-bg: #152433;
-  --c-success: #5EEAD4;
-
-  --glass-reflex-dark: 2;
-  --glass-reflex-light: 0.7;
-
-  --saturation: 200%;
-}
-
-body:has(input[value="dark"]:checked) {
-  --c-glass: #bbbbbc;
-  --c-light: #fff;
-  --c-dark: #000;
-  
-  --c-content: #e1e1e1;
-  --c-action: #03d5ff;
-  
-  --c-bg: #1b1b1d;
-
-  --c-mv: #A2C5EB; /*added*/
-  --c-success: #34D399; /*added*/
-  
-  --glass-reflex-dark: 2;
-  --glass-reflex-light: 0.3;
-  
-  --saturation: 150%;
-}
-
-body:has(input[value="dim"]:checked) {
-  --c-light: #99deff;
-  --c-dark: #20001b;
-  --c-glass: hsl(335 250% 74% / 1);
-  
-  --c-content: #d5dbe2;
-  --c-action: #ff48a9;
-  
-  --c-bg: #152433;
-  --c-success: #5EEAD4; /*added*/
-  
-  --glass-reflex-dark: 2;
-  --glass-reflex-light: 0.7;
-  
-  --saturation: 200%;
-}
-
 
 .switcher {
   position: fixed;
@@ -284,7 +249,6 @@ body:has(input[value="dim"]:checked) {
       cubic-bezier(1, 0.0, 0.4, 1),
     translate 400ms 
       cubic-bezier(1, 0.0, 0.4, 1);
-  animation: scaleToggle 440ms ease; 
 }
 
 .switcher:has(input[c-option="2"]:checked)::after {
@@ -296,30 +260,26 @@ body:has(input[value="dim"]:checked) {
       cubic-bezier(1, 0.0, 0.4, 1),
     translate 400ms 
       cubic-bezier(1, 0.0, 0.4, 1);
-  animation: scaleToggle2 440ms ease; 
+}
+
+/* The scale-pulse animations used to live directly on the two rules above,
+   which meant they played any time the :checked selector matched - including
+   at page load, when main.js's saved-theme restoration checks the dark radio
+   programmatically. That's not a "switch" from the user's point of view, so
+   it shouldn't animate. These two classes are added by main.js only inside
+   the radio's real 'change' event handler (see triggerSwitcherPulse()),
+   so the pulse plays on an actual switch and stays static on load/refresh. */
+.switcher.switch-anim-1::after {
+  animation: scaleToggle 440ms ease;
+}
+
+.switcher.switch-anim-2::after {
+  animation: scaleToggle2 440ms ease;
 }
 
 .switcher[c-previous="1"]:has(input[c-option="2"]:checked)::after {
   transform-origin: left;
 }
-
-.switcher[c-previous="3"]:has(input[c-option="2"]:checked)::after {
-  transform-origin: right;
-}
-
-.switcher:has(input[c-option="3"]:checked)::after {
-  translate: 152px 0;
-  transform-origin: left;
-  transition: 
-    background-color 400ms 
-      cubic-bezier(1, 0.0, 0.4, 1),
-    box-shadow 400ms
-      cubic-bezier(1, 0.0, 0.4, 1),
-    translate 400ms 
-      cubic-bezier(1, 0.0, 0.4, 1);
-  animation: scaleToggle3 440ms ease; 
-}
-
 
 @keyframes scaleToggle {
   0% { scale: 1 1; }
@@ -332,12 +292,6 @@ body:has(input[value="dim"]:checked) {
   50% { scale: 1.2 1; }
   100% { scale: 1 1; }
 } 
-
-@keyframes scaleToggle3 {
-  0% { scale: 1 1; }
-  50% { scale: 1.1 1; }
-  100% { scale: 1 1; }
-}
 
 h1 {
     margin-bottom: 20px;
@@ -383,6 +337,11 @@ h1 {
   z-index: 0;
 }
 
+.controls button:hover {
+  background: #F6F9FE;
+  color: #174ea6;
+}
+
 .controls button:active {
   box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
   outline: none;
@@ -410,7 +369,6 @@ h1 {
 
 .controls button:hover {
     background-color: #f0f0f0;
-    color: #174ea6;
 }
 
 body.dark-theme .controls button {
@@ -421,6 +379,15 @@ body.dark-theme .controls button {
 
 body.dark-theme .controls button:hover {
     background-color: #e0e0e0;
+}
+
+body.dark-theme .controls button.exit-setup {
+    background-color: #ffcccc;
+    color: #333;
+}
+
+body.dark-theme .controls button.exit-setup:hover {
+    background-color: #ffaaaa;
 }
 
 .controls button:disabled {
