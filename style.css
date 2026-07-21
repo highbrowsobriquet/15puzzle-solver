@@ -646,19 +646,38 @@ body.dark-theme .tile.correct {
         /* Leave room on the right so the shrunken switcher (top-right,
            fixed) doesn't sit on top of the title text. */
         padding-right: 90px;
+        /* Left-aligned so it lines up with the left edge of the button
+           grid below it, instead of being centered by .container's
+           justify-items. */
+        text-align: left;
+        justify-self: start;
     }
 
     /* .container becomes the single grid for the whole mobile layout, so
-       .controls (2x2 button grid) and .sidebar (stopwatch/steps) can sit
-       side by side on the same row, with the puzzle grid on its own row
-       below. .game-area is given `display: contents` so its two children
+       .controls (2x2 button grid) and .sidebar's content (stopwatch/steps)
+       can sit side by side, with the puzzle grid on its own row below.
+       .game-area is given `display: contents` so its two children
        (.puzzle-container and .sidebar) behave as if they were direct
        children of .container for grid-placement purposes, without any
-       change to the actual HTML nesting or to main.js's element references. */
+       change to the actual HTML nesting or to main.js's element references.
+
+       Row 2 (the button-grid band) is split into explicit named sub-rows -
+       equal padding above and below, with the stopwatch and step counter
+       each getting their own row in between - so the pair can be centered
+       as a genuine block against .controls' height. Two independent items
+       placed in a single shared row/column would each center independently
+       into the same spot and overlap; giving them distinct sub-rows avoids
+       that while still reading as one centered pair, since the padding
+       rows above and below are equal. */
     .container {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        grid-template-rows:
+            auto
+            [band-start] 1fr auto auto 1fr [band-end]
+            auto;
         column-gap: 12px;
+        row-gap: 0;
         justify-items: center;
     }
 
@@ -668,13 +687,13 @@ body.dark-theme .tile.correct {
 
     .controls {
         grid-column: 1;
-        grid-row: 2;
+        grid-row: band-start / band-end;
         margin-bottom: 0;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 8px;
         width: 100%;
-        align-self: start;
+        align-self: center;
     }
 
     .controls button {
@@ -689,7 +708,7 @@ body.dark-theme .tile.correct {
 
     .puzzle-container {
         grid-column: 1 / -1;
-        grid-row: 3;
+        grid-row: 6;
         margin-top: 20px;
     }
 
@@ -702,56 +721,57 @@ body.dark-theme .tile.correct {
         font-size: 7vw;
     }
 
+    /* .sidebar becomes display:contents so its three children (stopwatch,
+       step counter, solutionInfo) can each be placed independently on the
+       shared .container grid, without changing anything in the HTML. */
     .sidebar {
-        grid-column: 2;
-        grid-row: 2;
-        position: static;
-        width: 100%;
-        padding-left: 0;
-        margin-top: 0;
-        align-self: start;
-        /* flex-start, not center: centering was the actual cause of the
-           "everything shifts when the solve result text appears" bug. With
-           `center`, the sidebar's content block (stopwatch + steps +
-           solutionInfo) re-centers itself vertically every time
-           solutionInfo's text grows or shrinks, visibly nudging the
-           stopwatch/steps up or down each time. Pinning to the top means
-           the stopwatch and step counter never move; only the reserved
-           space below them (see #solutionInfo) is affected. */
-        justify-content: flex-start;
+        display: contents;
     }
 
+    #stopwatch, #step-counter {
+        grid-column: 2;
+    }
+
+    /* Stopwatch and step counter get their own distinct rows within the
+       band (the same auto/auto pair of rows .controls spans across), so
+       they stack as two separate, non-overlapping items - centered as a
+       pair because the 1fr rows above and below the band are equal. */
     #stopwatch {
-        /* Flush with the top of the button grid alongside it, rather than
-           sitting inside a vertically-centered block (see .sidebar above). */
+        grid-row: 3;
+        align-self: end;
         margin-top: 0;
         font-size: 20px;
     }
 
     #step-counter {
-        /* Pulled in closer underneath the stopwatch. */
+        grid-row: 4;
+        align-self: start;
         margin-top: 4px;
         font-size: 17px;
     }
 
-    #solutionInfo {
-        /* Sized so its bottom edge lines up with the bottom of the button
-           grid for the common messages ("Optimal path: N slides.", "Found
-           a path: N slides.", "Slides remaining: N", "Solved!" - all of
-           which are a single line at this width). Two rare messages (the
-           puzzle already being solved right after Setup Mode, or the
-           solver genuinely failing) run to 3 lines and will grow slightly
-           past this point - an acceptable trade since they're edge cases,
-           in exchange for pixel alignment on the messages seen almost all
-           the time. Either way, having a min-height at all is what stops
-           the whole layout from jumping every time a new result appears -
-           the space is already reserved, the text just fills more or less
-           of it. */
-        margin-top: 10px;
-        min-height: 48px;
+    /* The static "Click tiles to move them..." hint is only useful before
+       you've learned the game once - hide it on mobile now that its slot
+       carries something more useful: live solve status. */
+    .info p#status {
+        display: none;
     }
 
-    .info {
+    /* #solutionInfo is placed directly into .info's grid row via normal
+       grid placement (it stays a DOM child of .sidebar - see
+       display:contents above - so nothing about the HTML or main.js's
+       element references changes). Visually this replaces the now-hidden
+       "Click tiles..." hint with live solve status ("Analyzing slides...",
+       "Optimal path: N slides.", "Slides remaining: N", "Solved!", etc.)
+       in the exact spot that text used to occupy. */
+    #solutionInfo {
+        grid-column: 1 / -1;
+        grid-row: 7;
         margin-top: 10px;
+        min-height: 48px;
+        font-size: 15px;
     }
+
+    /* .info has no visible content left on mobile (its static hint text is
+       hidden above); its own box is harmless but doesn't need any styling. */
 }
