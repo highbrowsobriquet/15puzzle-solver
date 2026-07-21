@@ -713,11 +713,14 @@ body.dark-theme .tile.correct {
                being overall. */
             [band-start] auto auto auto auto [band-end]
             auto
-            /* The one genuinely flexible row: with no other fr tracks left
-               to compete with, it claims 100% of .container's leftover
-               height, pushing the status/hint text down into - and
-               centering it within - the free space below the puzzle grid. */
-            1fr;
+            /* Two equal spacer rows flank a fixed-floor text band (row 8),
+               so the band as a whole sits centered in .container's
+               leftover height (same equal-padding trick as the button band
+               above), while the band itself stays a constant size
+               regardless of which message is showing - see
+               #status/#solutionInfo below for why that constant size
+               matters. */
+            1fr minmax(52px, auto) 1fr;
         column-gap: 12px;
         row-gap: 0;
         justify-items: center;
@@ -802,29 +805,34 @@ body.dark-theme .tile.correct {
     }
 
     /* The idle hint and the live solve status now occupy the identical
-       grid cell (the trailing 1fr row), stacked on top of each other.
-       Only one is ever visible at a time (see the :has() rule below), so
-       there's no double-height or overlap - just whichever one applies. */
+       grid cell, stacked on top of each other. Only one is ever visible
+       at a time (see the has-live-status rule below), so there's no
+       double-height or overlap - just whichever one applies.
+       align-self: start (rather than center) matters here: it pins both
+       elements' first line to the same fixed position (the top of the
+       status-band row) regardless of how many lines that element's own
+       text happens to wrap to - centering each independently by its own
+       height is what let a short message (e.g. "Analyzing slides...")
+       land a few pixels away from where the two-line hint's first line
+       sits. */
     .info p#status {
         grid-column: 1 / -1;
-        grid-row: 7;
-        align-self: center;
+        grid-row: 8;
+        align-self: start;
         margin: 0;
         font-size: 17px;
     }
 
-    /* #solutionInfo is placed directly into the same trailing row (it
-       stays a DOM child of .sidebar - see display:contents above - so
-       nothing about the HTML or main.js's element references changes).
-       align-self: center vertically centers it within that row, which is
-       now tall (it absorbs .container's leftover height - see
-       grid-template-rows above) rather than being tight under the grid. */
+    /* #solutionInfo shares the exact same band and top-alignment as
+       #status above, so whichever one is visible, its first line lands
+       on the same line - the row's own minmax(52px, auto) floor (see
+       grid-template-rows above) reserves the space now, rather than this
+       element's own min-height. */
     #solutionInfo {
         grid-column: 1 / -1;
-        grid-row: 7;
-        align-self: center;
+        grid-row: 8;
+        align-self: start;
         margin-top: 0;
-        min-height: 52px;
         font-size: 17px;
     }
 
