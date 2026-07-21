@@ -829,11 +829,13 @@ body.dark-theme .tile.correct {
     }
 
     /* Hide the idle hint the moment there's a live status message to show
-       instead. #solutionInfo is set to textContent = "" on every reset,
-       shuffle, and the start of a manual move (see main.js), and to a
-       non-empty message for every setup/solve state - so :empty reliably
-       tracks "nothing to report yet" without needing JS to toggle a class. */
-    .container:has(#solutionInfo:not(:empty)) .info p#status {
+       instead. The has-live-status class is kept in sync with
+       #solutionInfo's empty/non-empty state by a MutationObserver in
+       main.js (rather than a CSS-only :has() selector, which some
+       browsers/WebViews don't support - and silently ignore the whole
+       rule rather than erroring, which is what let both texts stack on
+       top of each other undetected). */
+    body.has-live-status .info p#status {
         display: none;
     }
 }

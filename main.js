@@ -36,6 +36,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // On mobile, the idle "Click tiles..." hint (#status) and the live
+    // solve/setup status (#solutionInfo) share a single spot, with only one
+    // shown at a time (see style.css's mobile media query). Rather than a
+    // CSS-only :has() selector - which some browsers/WebViews still don't
+    // support, silently no-opping the whole hide rule and leaving both
+    // texts stacked on top of each other - a MutationObserver here mirrors
+    // #solutionInfo's empty/non-empty state onto <body> as a plain class,
+    // which every browser can select on. One observer covers every place
+    // in this file that sets solutionInfo.textContent, so no individual
+    // call site needs to remember to keep it in sync.
+    function syncLiveStatusClass() {
+        document.body.classList.toggle('has-live-status', solutionInfo.textContent.trim().length > 0);
+    }
+    new MutationObserver(syncLiveStatusClass).observe(solutionInfo, { childList: true });
+    syncLiveStatusClass();
+
     resetPuzzle();
 });
 
