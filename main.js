@@ -29,12 +29,41 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('setupModeBtn').onclick = toggleSetupMode;
 
     const inputs = document.querySelectorAll(".switcher__input");
+    const THEME_STORAGE_KEY = "15puzzle-theme";
+
+    function applyTheme(value) {
+        document.body.classList.remove("light-theme", "dark-theme", "dim-theme");
+        if (value !== "light") document.body.classList.add(`${value}-theme`);
+    }
+
     inputs.forEach((input) => {
         input.addEventListener("change", () => {
-            document.body.classList.remove("light-theme", "dark-theme", "dim-theme");
-            if (input.value !== "light") document.body.classList.add(`${input.value}-theme`);
+            applyTheme(input.value);
+            // Persist so the choice survives a refresh (or a whole lot of them).
+            try {
+                localStorage.setItem(THEME_STORAGE_KEY, input.value);
+            } catch (e) {
+                // Storage can be unavailable (private browsing, disabled storage,
+                // etc.) - theme switching itself should never break because of it.
+            }
         });
     });
+
+    // Restore the saved theme, if any, before the very first paint-relevant
+    // work below. Falls back silently to whatever was already checked in the
+    // markup (light) if nothing is stored or storage isn't available.
+    try {
+        const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme) {
+            const matchingInput = document.querySelector(`.switcher__input[value="${savedTheme}"]`);
+            if (matchingInput) {
+                matchingInput.checked = true;
+                applyTheme(savedTheme);
+            }
+        }
+    } catch (e) {
+        // Ignore - just keeps the default theme.
+    }
 
     // On mobile, the idle "Click tiles..." hint (#status) and the live
     // solve/setup status (#solutionInfo) share a single spot, with only one
