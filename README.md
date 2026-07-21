@@ -4,7 +4,7 @@ A 15-puzzle that actually solves itself — reliably, quickly, and in close to t
 
 I built this because I couldn't find one online that did all three at once. Most either freeze or time out on harder scrambles, take far more moves than necessary, or just don't look like something you'd want to sit and use. This one does none of that: shuffle, hit Solve, and it finds a near-optimal path in well under a second almost every time, with a slower but still-fast fallback for the rare pathological case.
 
-![Puzzle screenshot](screenshot.png)
+![Puzzle screenshot](15puzzle-solver-ui.png)
 
 ## Try it
 
