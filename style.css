@@ -598,6 +598,15 @@ body.dark-theme .tile.correct {
         flex-direction: column;
         padding: 28px 12px 12px;
         align-items: center;
+        /* The base rule's justify-content: center (inherited here, since this
+           media query only overrides flex-direction/padding/align-items) was
+           vertically centering the whole page's content in the viewport,
+           so the header's distance from the top varied with screen height
+           and content height instead of being fixed. Anchoring to the top
+           makes that distance deterministic - required for the header to
+           reliably line up against the switcher below, which is itself
+           pinned to a fixed 28px from the top. */
+        justify-content: flex-start;
     }
 
     .switcher {
@@ -651,6 +660,17 @@ body.dark-theme .tile.correct {
            justify-items. */
         text-align: left;
         justify-self: start;
+        /* Force h1's rendered box height to match the switcher's rendered
+           height exactly (70px base height * 0.58 mobile scale = 40.6px).
+           Since h1's top edge and the switcher's top edge are now both
+           pinned to the same 28px offset from the viewport top (see body's
+           justify-content change above, and .switcher's own top: 28px),
+           giving them equal height puts their vertical centers on the
+           exact same horizontal line, regardless of viewport size. Setting
+           line-height directly (rather than height) keeps the single line
+           of text centered within that box via its own half-leading. */
+        line-height: 40.6px;
+        margin-top: 0;
     }
 
     /* .container becomes the single grid for the whole mobile layout, so
@@ -671,17 +691,39 @@ body.dark-theme .tile.correct {
        rows above and below are equal. */
     .container {
         display: grid;
+        /* Grow to fill whatever vertical space is left in the viewport
+           below the natural content (h1 through the puzzle grid), so the
+           trailing 1fr row below has real leftover space to absorb instead
+           of collapsing to zero. Safe now that body is top-anchored (see
+           justify-content change above) rather than centering .container
+           as a block. */
+        flex-grow: 1;
         grid-template-columns: 1fr 1fr;
         grid-template-rows:
             auto
-            [band-start] 1fr auto auto 1fr [band-end]
-            auto;
+            /* The band's flanking rows were 1fr/1fr. That's fine when
+               .container's height is exactly its content's natural height
+               (no page-level leftover space to distribute), but now that
+               .container stretches to fill the viewport (flex-grow above),
+               any track using fr shares in *all* of that leftover space -
+               which would inflate this band far beyond .controls' own
+               height. Switching to auto keeps these two rows sized purely
+               to satisfy .controls' spanning height (the same equal-padding
+               centering as before), immune to how tall .container ends up
+               being overall. */
+            [band-start] auto auto auto auto [band-end]
+            auto
+            /* The one genuinely flexible row: with no other fr tracks left
+               to compete with, it claims 100% of .container's leftover
+               height, pushing the status/hint text down into - and
+               centering it within - the free space below the puzzle grid. */
+            1fr;
         column-gap: 12px;
         row-gap: 0;
         justify-items: center;
     }
 
-    h1, .info {
+    h1 {
         grid-column: 1 / -1;
     }
 
@@ -735,7 +777,8 @@ body.dark-theme .tile.correct {
     /* Stopwatch and step counter get their own distinct rows within the
        band (the same auto/auto pair of rows .controls spans across), so
        they stack as two separate, non-overlapping items - centered as a
-       pair because the 1fr rows above and below the band are equal. */
+       pair because the auto padding rows above and below the band grow
+       equally to satisfy .controls' height (see grid-template-rows above). */
     #stopwatch {
         grid-row: 3;
         align-self: end;
@@ -750,28 +793,47 @@ body.dark-theme .tile.correct {
         font-size: 17px;
     }
 
-    /* The static "Click tiles to move them..." hint is only useful before
-       you've learned the game once - hide it on mobile now that its slot
-       carries something more useful: live solve status. */
-    .info p#status {
-        display: none;
+    /* .info is given display: contents (same trick as .game-area/.sidebar
+       above) so its child #status can be placed directly on .container's
+       grid - sharing the exact same cell as #solutionInfo below - instead
+       of being confined to its own separate box/row. */
+    .info {
+        display: contents;
     }
 
-    /* #solutionInfo is placed directly into .info's grid row via normal
-       grid placement (it stays a DOM child of .sidebar - see
-       display:contents above - so nothing about the HTML or main.js's
-       element references changes). Visually this replaces the now-hidden
-       "Click tiles..." hint with live solve status ("Analyzing slides...",
-       "Optimal path: N slides.", "Slides remaining: N", "Solved!", etc.)
-       in the exact spot that text used to occupy. */
+    /* The idle hint and the live solve status now occupy the identical
+       grid cell (the trailing 1fr row), stacked on top of each other.
+       Only one is ever visible at a time (see the :has() rule below), so
+       there's no double-height or overlap - just whichever one applies. */
+    .info p#status {
+        grid-column: 1 / -1;
+        grid-row: 7;
+        align-self: center;
+        margin: 0;
+        font-size: 17px;
+    }
+
+    /* #solutionInfo is placed directly into the same trailing row (it
+       stays a DOM child of .sidebar - see display:contents above - so
+       nothing about the HTML or main.js's element references changes).
+       align-self: center vertically centers it within that row, which is
+       now tall (it absorbs .container's leftover height - see
+       grid-template-rows above) rather than being tight under the grid. */
     #solutionInfo {
         grid-column: 1 / -1;
         grid-row: 7;
-        margin-top: 10px;
-        min-height: 48px;
-        font-size: 15px;
+        align-self: center;
+        margin-top: 0;
+        min-height: 52px;
+        font-size: 17px;
     }
 
-    /* .info has no visible content left on mobile (its static hint text is
-       hidden above); its own box is harmless but doesn't need any styling. */
+    /* Hide the idle hint the moment there's a live status message to show
+       instead. #solutionInfo is set to textContent = "" on every reset,
+       shuffle, and the start of a manual move (see main.js), and to a
+       non-empty message for every setup/solve state - so :empty reliably
+       tracks "nothing to report yet" without needing JS to toggle a class. */
+    .container:has(#solutionInfo:not(:empty)) .info p#status {
+        display: none;
+    }
 }
