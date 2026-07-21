@@ -598,11 +598,6 @@ body.dark-theme .tile.correct {
         flex-direction: column;
         padding: 28px 12px 12px;
         align-items: center;
-        /* Shared with .switcher and h1 below, so the title's vertical
-           centering can be derived from the exact same scale factor the
-           switcher itself uses, instead of a second hand-copied magic
-           number that could quietly drift out of sync with it. */
-        --switcher-mobile-scale: 0.58;
     }
 
     .switcher {
@@ -623,7 +618,7 @@ body.dark-theme .tile.correct {
            would if only some of the pixel values below were changed. transform-origin
            keeps it anchored to its own top-right corner as it shrinks, so it
            stays tucked in the corner instead of scaling toward the center. */
-        transform: scale(var(--switcher-mobile-scale));
+        transform: scale(0.58);
         transform-origin: top right;
         /* Belt-and-suspenders: even with the correct containing block
            restored above, clip anything that tries to render outside the
@@ -656,16 +651,6 @@ body.dark-theme .tile.correct {
            justify-items. */
         text-align: left;
         justify-self: start;
-        /* Vertically center the title against the switcher pill. Both
-           start at the same y-offset (body's 28px padding-top matches the
-           switcher's fixed `top`), so giving h1 the switcher's own
-           rendered height - its 70px base height times the same mobile
-           scale factor .switcher uses - and centering the text inside
-           that height lines the two centers up exactly, without having to
-           hand-tune it against font-metric guesswork. */
-        height: calc(70px * var(--switcher-mobile-scale));
-        display: flex;
-        align-items: center;
     }
 
     /* .container becomes the single grid for the whole mobile layout, so
@@ -723,7 +708,7 @@ body.dark-theme .tile.correct {
 
     .puzzle-container {
         grid-column: 1 / -1;
-        grid-row: 7;
+        grid-row: 6;
         margin-top: 20px;
     }
 
@@ -765,47 +750,28 @@ body.dark-theme .tile.correct {
         font-size: 17px;
     }
 
-    /* Static hint and live solve-status now share one slot, positioned
-       between the button band and the puzzle grid (row 6) instead of
-       being squeezed underneath the grid at the bottom of the page. Only
-       one is ever visible at a time: the hint ("Click tiles to move
-       them...") is the default, and it's swapped out for the live status
-       the instant main.js puts real text into #solutionInfo - purely in
-       CSS, via :empty/:has(), so nothing in main.js needs to know or care
-       that mobile displays this differently from desktop. Both get the
-       same font-size and min-height so the puzzle grid below doesn't jump
-       up or down depending on which one is showing, or how many lines it
-       wraps to. */
-    .info {
-        grid-row: 6;
-        margin-top: 10px;
+    /* The static "Click tiles to move them..." hint is only useful before
+       you've learned the game once - hide it on mobile now that its slot
+       carries something more useful: live solve status. */
+    .info p#status {
+        display: none;
     }
 
-    #status {
-        font-size: 17px;
-        text-align: center;
-        min-height: 48px;
-    }
-
+    /* #solutionInfo is placed directly into .info's grid row via normal
+       grid placement (it stays a DOM child of .sidebar - see
+       display:contents above - so nothing about the HTML or main.js's
+       element references changes). Visually this replaces the now-hidden
+       "Click tiles..." hint with live solve status ("Analyzing slides...",
+       "Optimal path: N slides.", "Slides remaining: N", "Solved!", etc.)
+       in the exact spot that text used to occupy. */
     #solutionInfo {
         grid-column: 1 / -1;
-        grid-row: 6;
+        grid-row: 7;
         margin-top: 10px;
-        font-size: 17px;
-        text-align: center;
         min-height: 48px;
+        font-size: 15px;
     }
 
-    /* main.js resets solutionInfo to "" between attempts (resetPuzzle,
-       mix, etc.) - keep that state out of the layout entirely rather than
-       reserving space for an empty line. */
-    #solutionInfo:empty {
-        display: none;
-    }
-
-    /* The moment solutionInfo actually has text, it's sharing row 6 with
-       the static hint - hide the hint so the two don't double up. */
-    .container:has(#solutionInfo:not(:empty)) .info {
-        display: none;
-    }
+    /* .info has no visible content left on mobile (its static hint text is
+       hidden above); its own box is harmless but doesn't need any styling. */
 }
