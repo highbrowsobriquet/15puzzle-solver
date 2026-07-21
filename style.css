@@ -57,6 +57,53 @@ body {
   transition: background 400ms cubic-bezier(1, 0.0, 0.4, 1), color 400ms cubic-bezier(1, 0.0, 0.4, 1);
 }
 
+/* Mirrors of the two blocks below, keyed off a class set on <html> instead
+   of the radio's :has(:checked) state. An inline script at the very top of
+   index.html's <head> sets this class from localStorage before the browser's
+   first paint - :has() can't do that on its own because the radio inputs
+   it depends on don't exist in the DOM yet at that point, so without this,
+   the page always paints once in the light theme first and then swaps,
+   which is what caused the flash on reload. Values are identical to their
+   :has() counterparts on purpose: once main.js runs, it checks the matching
+   radio (making the :has() rule match too) and keeps this class in sync, so
+   the two mechanisms never disagree - this one just covers the gap before
+   that JS has had a chance to run. */
+html.theme-dark body {
+  --c-glass: #bbbbbc;
+  --c-light: #fff;
+  --c-dark: #000;
+
+  --c-content: #e1e1e1;
+  --c-action: #03d5ff;
+
+  --c-bg: #1b1b1d;
+
+  --c-mv: #A2C5EB;
+  --c-success: #34D399;
+
+  --glass-reflex-dark: 2;
+  --glass-reflex-light: 0.3;
+
+  --saturation: 150%;
+}
+
+html.theme-dim body {
+  --c-light: #99deff;
+  --c-dark: #20001b;
+  --c-glass: hsl(335 250% 74% / 1);
+
+  --c-content: #d5dbe2;
+  --c-action: #ff48a9;
+
+  --c-bg: #152433;
+  --c-success: #5EEAD4;
+
+  --glass-reflex-dark: 2;
+  --glass-reflex-light: 0.7;
+
+  --saturation: 200%;
+}
+
 body:has(input[value="dark"]:checked) {
   --c-glass: #bbbbbc;
   --c-light: #fff;
@@ -336,11 +383,6 @@ h1 {
   z-index: 0;
 }
 
-.controls button:hover {
-  background: #F6F9FE;
-  color: #174ea6;
-}
-
 .controls button:active {
   box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%), 0 8px 12px 6px rgb(60 64 67 / 15%);
   outline: none;
@@ -368,6 +410,7 @@ h1 {
 
 .controls button:hover {
     background-color: #f0f0f0;
+    color: #174ea6;
 }
 
 body.dark-theme .controls button {
@@ -378,15 +421,6 @@ body.dark-theme .controls button {
 
 body.dark-theme .controls button:hover {
     background-color: #e0e0e0;
-}
-
-body.dark-theme .controls button.exit-setup {
-    background-color: #ffcccc;
-    color: #333;
-}
-
-body.dark-theme .controls button.exit-setup:hover {
-    background-color: #ffaaaa;
 }
 
 .controls button:disabled {

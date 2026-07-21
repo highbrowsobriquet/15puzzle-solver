@@ -4,6 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>15 Puzzle Solver</title>
+    <!--
+      Applies the saved theme to <html> before the stylesheet even has a
+      chance to paint the page once in the default (light) theme. This has
+      to be inline and placed before the stylesheet link so it runs
+      synchronously first thing, blocking the parser - anything deferred
+      to DOMContentLoaded (as the actual theme-switching logic in main.js
+      is) runs *after* the browser's first paint, which is what caused a
+      visible flash of the wrong theme on reload. This script only ever
+      sets a class name; main.js still owns all the actual switching logic
+      and keeps this class in sync afterwards, so there's exactly one
+      source of truth for "what the saved theme is" (localStorage) even
+      though two mechanisms read it.
+    -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem("15puzzle-theme");
+                if (t && t !== "light") {
+                    document.documentElement.className = "theme-" + t;
+                }
+            } catch (e) {
+                // Storage unavailable - just fall through to the default theme.
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>

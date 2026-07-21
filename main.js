@@ -34,6 +34,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function applyTheme(value) {
         document.body.classList.remove("light-theme", "dark-theme", "dim-theme");
         if (value !== "light") document.body.classList.add(`${value}-theme`);
+        // Keep <html>'s class (set early/synchronously in index.html's inline
+        // head script, before first paint, to avoid a flash-of-wrong-theme on
+        // load) in sync with whatever theme is now active, from whichever
+        // source changed it (a click here, or the restored value on load).
+        document.documentElement.className = (value !== "light") ? `theme-${value}` : "";
     }
 
     inputs.forEach((input) => {
@@ -49,9 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Restore the saved theme, if any, before the very first paint-relevant
-    // work below. Falls back silently to whatever was already checked in the
-    // markup (light) if nothing is stored or storage isn't available.
+    // Restore the saved theme's radio state (the actual theme colors are
+    // already showing pre-paint, applied by the inline script in index.html's
+    // <head> - this just brings the visible UI, e.g. which icon looks
+    // "selected", into agreement with that).
     try {
         const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
         if (savedTheme) {
