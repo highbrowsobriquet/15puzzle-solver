@@ -8,14 +8,27 @@ I built this because I couldn't find one online that did all three at once. Most
 
 ## Try it
 
-Just open `index.html` in a browser. It's plain HTML, CSS, and JavaScript.
+**Live:** [15 Puzzle Solver on GitHub Pages](https://highbrowsobriquet.github.io/15puzzle-solver/)
+
+**Local:** Clone the repo and open `index.html` in a browser. It's plain HTML, CSS, and JavaScript — no build step or server needed.
 
 ## What it does
 
-- **Click tiles or drag a solution through automatically** — manual play and auto-solve share the same board state, so you can mix the two freely (solve a few moves by hand, then let it finish, or interrupt an auto-solve mid-way to try something yourself).
-- **Solves optimally in the vast majority of cases**, and always terminates quickly even on the rare board that would otherwise take a search too long to finish.
+**Core solver:**
+
+- **Solves optimally in the vast majority of cases**, and always terminates quickly even on the rare board that would otherwise take a search too long to finish. Finds near-optimal solutions in well under a second almost every time.
+
+**Hybrid solving:**
+
+- **Click tiles or let the solver take over** — manual play and auto-solve share the same board state, so you can mix the two freely (solve a few moves by hand, then let it finish, or interrupt an auto-solve mid-way to try something yourself).
+
+**Customization:**
+
 - **Setup Mode** lets you arrange any starting position by hand instead of only shuffling from solved.
-- **Light and dark themes**, with a glassy, animated theme switcher ([by Vadim Matveev](https://codepen.io/fooontic/pen/KwpRaGr)).
+
+**Visual feedback & polish:**
+
+- **Light and dark themes**, with a glassy, animated theme switcher ([by Vadim Matveev](https://codepen.io/fooontic/pen/KwpRaGr)). Theme preference persists across page reloads.
 - Tiles that are already in their correct spot get a quiet green tint, so you can see yourself converging on the solution as you go.
 - A green flash sweeps the board the moment you solve it.
 - Click a tile that can't legally move and it gives a quick shake instead of just sitting there unresponsive.
